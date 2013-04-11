@@ -17,9 +17,5 @@ There are also two other functions common to all libraries:
 - enableMillis(): Enables Arduino's default millisecond counter.
 
 In order to receive the notifications, an interrupt handler must be setup as shown below:
-ISR(timerNNNEvent)
-{
-  resetTimerNNN();
-  // Rest of code
-} 
 
+ISR(timerNNNEvent)<br/>{<br/>  resetTimerNNN();<br/>  // Handler code<br/>}
