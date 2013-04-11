@@ -13,8 +13,10 @@ Each library has five functions:
 Where NNN is 1, 3, 4 or 5, depending on the chosen library.
 
 There are also two other functions common to all libraries:
-- disableMillis(): Disables Arduino's default millisecond counter, rendering millis(), micros(), delay() and delayMicroseconds() useless, while saving some processing power.
-- enableMillis(): Enables Arduino's default millisecond counter.
+- void disableMillis(): Disables Arduino's default millisecond counter, rendering millis(), micros(), delay() and delayMicroseconds() useless, while saving some processing power.
+- void enableMillis(): Enables Arduino's default millisecond counter.
+
+Functions resetTimerNNN, pauseTimerNNN, resumeTimerNNN, disableMillis and enableMillis are actually implemented as macros for best performance.
 
 In order to receive the notifications, an interrupt handler must be setup as shown below:
 
