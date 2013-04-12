@@ -37,8 +37,6 @@
 
 #include <inttypes.h>
 
-// 16.9.2 TCCR0B – Timer/Counter Control Register B (page 132)
-// TCCR0B has Original value is 3
 // 16.9.6 TIMSK0 – Timer/Counter Interrupt Mask Register (page 134)
 #ifndef disableMillis
 #define disableMillis() TIMSK0 &= (~TIMSK0)
