@@ -21,7 +21,123 @@ Functions resetTimerNNN, pauseTimerNNN, resumeTimerNNN, disableMillis and enable
 
 In order to receive the notifications, an interrupt handler must be setup as shown below:
 
-ISR(timerNNNEvent)<br/>{<br/>  resetTimerNNN();<br/>  // Handler code<br/>}
-
+``` c++
+ISR(timerNNNEvent)
+{
+  resetTimerNNN();
+  // Handler code
+}
+```
 
 Reference documentation: http://www.atmel.com/devices/atmega2560.aspx
+
+
+<hr/>
+
+
+Example 1 - TimerBlinking
+-------------------------
+``` c++
+#include <Timer1.h>
+
+// Pin 13 has an LED connected on most Arduino boards
+#define LED 13
+byte ledState;
+
+void setup()
+{
+  ledState = 0;
+  // Prepare Timer1 to send notifications every 1000000us (1s)
+  startTimer1(1000000);
+  pinMode(LED, OUTPUT);
+}
+
+void loop()
+{
+}
+
+// Define the function which will handle the notifications
+ISR(timer1Event)
+{
+  // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
+  resetTimer1();
+  
+  // Make sure to do your work as fast as possible, since interrupts are automatically
+  // disabled when this event happens (refer to interrupts() and noInterrupts() for
+  // more information on that)
+  
+  // Toggle led's state
+  ledState ^= 1;
+  digitalWrite(LED, ledState);
+}
+```
+
+Example 2 - TimerCounting
+-------------------------
+``` c++
+#include <Timer1.h>
+
+unsigned int lastTime;
+
+void setup()
+{
+  // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
+  // delay() and delayMicroseconds() will not work)
+  disableMillis();
+  // Prepare Timer1 to count
+  // (4us resolution on 16 MHz boards and 8us resolution on 8 MHz boards)
+  startCountingTimer1();
+  lastTime = readTimer1();
+}
+
+void loop()
+{
+  unsigned int now = readTimer1(), delta, deltamicros;
+  delta = now - lastTime;
+  // Multiply delta either by 4 or by 8, depending on the CPU frequency,
+  // to obtain the amount of microseconds elapsed since last time
+  // If you estimate this value could be > 65 ms, or 65535 us,
+  // delta should be cast to unsigned long, and deltamicros should be
+  // created as an unsigned long variable
+  deltamicros = delta << 2; // Multiplying by 4 (<< 3 multiplies by 8)
+  
+  // Do your work here
+  
+  lastTime = now;
+}
+```
+
+Example 3 - TimerNotificationCounting
+-------------------------------------
+``` c++
+#include <Timer1.h>
+
+unsigned int myMillis;
+
+void setup()
+{
+  myMillis = 0;
+  // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
+  // delay() and delayMicroseconds() will not work)
+  disableMillis();
+  // Prepare Timer1 to send notifications every 1000us (1ms)
+  startTimer1(1000);
+}
+
+void loop()
+{
+}
+
+// Define the function which will handle the notifications
+ISR(timer1Event)
+{
+  // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
+  resetTimer1();
+  
+  // Make sure to do your work as fast as possible, since interrupts are automatically
+  // disabled when this event happens (refer to interrupts() and noInterrupts() for
+  // more information on that)
+  
+  myMillis++;
+}
+```
