@@ -1,0 +1,8 @@
+disableMillis	KEYWORD2
+enableMillis	KEYWORD2
+resetTimer5	KEYWORD2
+pauseTimer5	KEYWORD2
+resumeTimer5	KEYWORD2
+startTimer5	KEYWORD2
+readTimer5	KEYWORD2
+timer5Event	KEYWORD2
