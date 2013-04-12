@@ -51,6 +51,7 @@ extern uint16_t __timer4CounterValue;
 #define pauseTimer4() TCCR4B = 0
 #define resumeTimer4() TCCR4B = __timer4Control
 extern void startTimer4(uint32_t microsecondsInterval);
+extern void startCountingTimer4(void);
 extern uint16_t readTimer4(void);
 
 // 17.9.1 Normal Mode (page 149)

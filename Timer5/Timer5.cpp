@@ -83,6 +83,21 @@ void startTimer5(uint32_t microsecondsInterval) {
   TIMSK5 = 1;
   resumeTimer5();
 }
+void startCountingTimer5(void) {
+  pauseTimer5();
+  TCCR5A = 0;
+  TCCR5C = 0;
+#if (F_CPU == 16000000L) || (F_CPU == 8000000L)
+  __timer5Control = B00000011;
+  __timer5CounterValue = 0;
+#else
+  #error("Unsupported CPU frequency")
+#endif
+  resetTimer5();
+  TIFR5 = 0;
+  TIMSK5 = 0;
+  resumeTimer5();
+}
 uint16_t readTimer5(void) {
   // 17.3 Accessing 16-bit Registers (page 138)
   uint8_t sreg;

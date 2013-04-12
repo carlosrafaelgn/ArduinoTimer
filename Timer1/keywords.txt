@@ -4,5 +4,6 @@ resetTimer1	KEYWORD2
 pauseTimer1	KEYWORD2
 resumeTimer1	KEYWORD2
 startTimer1	KEYWORD2
+startCountingTimer1	KEYWORD2
 readTimer1	KEYWORD2
 timer1Event	KEYWORD2

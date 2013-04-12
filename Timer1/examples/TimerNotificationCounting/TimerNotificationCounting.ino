@@ -1,15 +1,15 @@
 #include <Timer1.h>
 
-// Pin 13 has an LED connected on most Arduino boards
-#define LED 13
-byte ledState;
+unsigned int myMillis;
 
 void setup()
 {
-  ledState = 0;
-  // Prepare Timer1 to send notifications every 1000000us (1s)
-  startTimer1(1000000);
-  pinMode(LED, OUTPUT);
+  myMillis = 0;
+  // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
+  // delay() and delayMicroseconds() will not work)
+  disableMillis();
+  // Prepare Timer1 to send notifications every 1000us (1ms)
+  startTimer1(1000);
 }
 
 void loop()
@@ -26,7 +26,5 @@ ISR(timer1Event)
   // disabled when this event happens (refer to interrupts() and noInterrupts() for
   // more information on that)
   
-  // Toggle led's state
-  ledState ^= 1;
-  digitalWrite(LED, ledState);
+  myMillis++;
 }

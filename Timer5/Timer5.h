@@ -51,6 +51,7 @@ extern uint16_t __timer5CounterValue;
 #define pauseTimer5() TCCR5B = 0
 #define resumeTimer5() TCCR5B = __timer5Control
 extern void startTimer5(uint32_t microsecondsInterval);
+extern void startCountingTimer5(void);
 extern uint16_t readTimer5(void);
 
 // 17.9.1 Normal Mode (page 149)
