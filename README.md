@@ -21,3 +21,6 @@ Functions resetTimerNNN, pauseTimerNNN, resumeTimerNNN, disableMillis and enable
 In order to receive the notifications, an interrupt handler must be setup as shown below:
 
 ISR(timerNNNEvent)<br/>{<br/>  resetTimerNNN();<br/>  // Handler code<br/>}
+
+
+Reference documentation: http://www.atmel.com/devices/atmega2560.aspx
