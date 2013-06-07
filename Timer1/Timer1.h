@@ -33,26 +33,35 @@
 #ifndef Timer1_h
 #define Timer1_h
 
-// Reference documentation: http://www.atmel.com/devices/atmega2560.aspx
+// Reference documentation:
+// http://www.atmel.com/devices/atmega2560.aspx
+// http://www.atmel.com/devices/atmega328.aspx
+//
+// Timer 1 is available on ATmega168, ATmega328 and on ATmega2560
+// All other timers are only available on ATmega2560
+//
+// (The page and chapter numbers refer to the ATmega2560 documentation)
 
 #include <inttypes.h>
 
 // 16.9.6 TIMSK0 – Timer/Counter Interrupt Mask Register (page 134)
 #ifndef disableMillis
-#define disableMillis() TIMSK0 &= (~TIMSK0)
+#define disableMillis() TIMSK0 = 0
 #endif
 #ifndef enableMillis
-#define enableMillis() TIMSK0 |= TIMSK0
+#define enableMillis() TIMSK0 = 1
 #endif
 
 extern uint8_t __timer1Control;
 extern uint16_t __timer1CounterValue;
-#define resetTimer1() TCNT1 = __timer1CounterValue
+#define readTimer1Unsafe() TCNT1
+#define resetTimer1Unsafe() TCNT1 = __timer1CounterValue
 #define pauseTimer1() TCCR1B = 0
 #define resumeTimer1() TCCR1B = __timer1Control
 extern void startTimer1(uint32_t microsecondsInterval);
 extern void startCountingTimer1(void);
 extern uint16_t readTimer1(void);
+extern void resetTimer1(void);
 
 // 17.9.1 Normal Mode (page 149)
 // The simplest mode of operation is the Normal mode (WGMn3:0 = 0). In this mode the counting

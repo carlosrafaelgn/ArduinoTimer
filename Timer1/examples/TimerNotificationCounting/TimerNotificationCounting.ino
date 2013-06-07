@@ -21,6 +21,9 @@ ISR(timer1Event)
 {
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
   resetTimer1();
+  // For a smaller and faster code, the line above could safely be replaced with a call
+  // to the function resetTimer1Unsafe() as, despite of its name, it IS safe to call
+  // that function in here (interrupts are disabled)
   
   // Make sure to do your work as fast as possible, since interrupts are automatically
   // disabled when this event happens (refer to interrupts() and noInterrupts() for

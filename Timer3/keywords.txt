@@ -1,9 +1,11 @@
 disableMillis	KEYWORD2
 enableMillis	KEYWORD2
 resetTimer3	KEYWORD2
+resetTimer3Unsafe	KEYWORD2
 pauseTimer3	KEYWORD2
 resumeTimer3	KEYWORD2
 startTimer3	KEYWORD2
 startCountingTimer3	KEYWORD2
 readTimer3	KEYWORD2
+readTimer3Unsafe	KEYWORD2
 timer3Event	KEYWORD2

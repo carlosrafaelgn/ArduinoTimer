@@ -108,8 +108,21 @@ uint16_t readTimer3(void) {
   // Disable interrupts
   cli();
   // Read TCNTn
-  i = TCNT3;
+  i = readTimer3Unsafe();
   // Restore global interrupt flag
   SREG = sreg;
   return i;
+}
+void resetTimer3(void) {
+  // 17.3 Accessing 16-bit Registers (page 138)
+  uint8_t sreg;
+  // Save global interrupt flag
+  // 7.4.1 SREG – AVR Status Register (page 14)
+  sreg = SREG;
+  // Disable interrupts
+  cli();
+  // Write TCNTn
+  resetTimer3Unsafe();
+  // Restore global interrupt flag
+  SREG = sreg;
 }

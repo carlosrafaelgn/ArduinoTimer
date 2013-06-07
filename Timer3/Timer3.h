@@ -34,25 +34,30 @@
 #define Timer3_h
 
 // Reference documentation: http://www.atmel.com/devices/atmega2560.aspx
+//
+// Timer 1 is available on ATmega168, ATmega328 and on ATmega2560
+// All other timers are only available on ATmega2560
 
 #include <inttypes.h>
 
 // 16.9.6 TIMSK0 – Timer/Counter Interrupt Mask Register (page 134)
 #ifndef disableMillis
-#define disableMillis() TIMSK0 &= (~TIMSK0)
+#define disableMillis() TIMSK0 = 0
 #endif
 #ifndef enableMillis
-#define enableMillis() TIMSK0 |= TIMSK0
+#define enableMillis() TIMSK0 = 1
 #endif
 
 extern uint8_t __timer3Control;
 extern uint16_t __timer3CounterValue;
-#define resetTimer3() TCNT3 = __timer3CounterValue
+#define readTimer3Unsafe() TCNT3
+#define resetTimer3Unsafe() TCNT3 = __timer3CounterValue
 #define pauseTimer3() TCCR3B = 0
 #define resumeTimer3() TCCR3B = __timer3Control
 extern void startTimer3(uint32_t microsecondsInterval);
 extern void startCountingTimer3(void);
 extern uint16_t readTimer3(void);
+extern void resetTimer3(void);
 
 // 17.9.1 Normal Mode (page 149)
 // The simplest mode of operation is the Normal mode (WGMn3:0 = 0). In this mode the counting

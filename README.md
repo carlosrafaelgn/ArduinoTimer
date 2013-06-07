@@ -3,13 +3,17 @@ ArduinoTimer
 
 ArduinoTimer is a library, which aims at providing developers with means to schedule asynchronous timer execution, pretty much like timer services provided by real OSes. In fact, it is a set of libraries, one for each timer available in ATmega2560 (1, 3, 4 and 5). By dividing the full library into four smaller libraries, the developer can save both RAM and Flash memory.
 
-Each library has six functions:
+Timer1 can also be used with ATmega168 and with ATmega328. Nevertheless, Timer3, Timer4 and Timer5 are exclusive to ATmega2560.
+
+Each library has eight functions:
 - void startTimerNNN(unsigned long microsecondsInterval): Starts the timer, and schedules the first notification. On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 260000, and a resolution of 16us for greater intervals. On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 520000, and a resolution of 32us for greater intervals. 
 - void startCountingTimerNNN(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 4us. On 8 MHz Arduino boards, the timer has a resolution of 8us. In other words, the value returned by readTimerNNN() should be multiplied either by 4 ou by 8 to get the actual amount of microseconds. The value returned by readTimerNNN() resets approximately every 262ms on 16 MHz boards, and every 524ms on 8 MHz boards.
 - void resetTimerNNN(): Resets the timer's counter. This function should be called as soon as a notification is received, in order to properly prepare the timer for the next notification.
+- void resetTimerNNNUnsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
 - void pauseTimerNNN(): Pauses the timer, halting the counting and thus, preventing any further notifications.
 - void resumeTimerNNN(): Resumes the timer.
 - unsigned int readTimerNNN(): Returns the current value of the timer's counter.
+- unsigned int readTimerNNNUnsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
 
 Where NNN is 1, 3, 4 or 5, depending on the chosen library.
 
@@ -29,8 +33,9 @@ ISR(timerNNNEvent)
 }
 ```
 
-Reference documentation: http://www.atmel.com/devices/atmega2560.aspx
-
+Reference documentation:
+http://www.atmel.com/devices/atmega2560.aspx
+http://www.atmel.com/devices/atmega328.aspx
 
 <hr/>
 
@@ -61,6 +66,9 @@ ISR(timer1Event)
 {
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
   resetTimer1();
+  // For a smaller and faster code, the line above could safely be replaced with a call
+  // to the function resetTimer1Unsafe() as, despite of its name, it IS safe to call
+  // that function in here (interrupts are disabled)
   
   // Make sure to do your work as fast as possible, since interrupts are automatically
   // disabled when this event happens (refer to interrupts() and noInterrupts() for
@@ -133,6 +141,9 @@ ISR(timer1Event)
 {
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
   resetTimer1();
+  // For a smaller and faster code, the line above could safely be replaced with a call
+  // to the function resetTimer1Unsafe() as, despite of its name, it IS safe to call
+  // that function in here (interrupts are disabled)
   
   // Make sure to do your work as fast as possible, since interrupts are automatically
   // disabled when this event happens (refer to interrupts() and noInterrupts() for
