@@ -34,7 +34,9 @@ ISR(timerNNNEvent)
 ```
 
 Reference documentation:
+
 http://www.atmel.com/devices/atmega2560.aspx
+
 http://www.atmel.com/devices/atmega328.aspx
 
 <hr/>
