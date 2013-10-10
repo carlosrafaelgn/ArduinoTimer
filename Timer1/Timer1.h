@@ -1,5 +1,5 @@
 //
-// Timer1.h is distributed under the FreeBSD License
+// ArduinoTimer is distributed under the FreeBSD License
 //
 // Copyright (c) 2013, Carlos Rafael Gimenes das Neves
 // All rights reserved.
@@ -28,7 +28,7 @@
 // of the authors and should not be interpreted as representing official policies, 
 // either expressed or implied, of the FreeBSD Project.
 //
-// https://github.com/carlosrafaelgn/ArduinoTimer/blob/master/Timer1/Timer1.h
+// https://github.com/carlosrafaelgn/ArduinoTimer
 //
 #ifndef Timer1_h
 #define Timer1_h
