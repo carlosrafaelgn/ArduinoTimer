@@ -154,3 +154,5 @@ ISR(timer1Event)
   myMillis++;
 }
 ```
+
+This projected is licensed under the terms of the FreeBSD License. See LICENSE.txt for more details.
