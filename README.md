@@ -41,6 +41,22 @@ http://www.atmel.com/devices/atmega328.aspx
 
 <hr/>
 
+Timers and PWM (analogWrite)
+----------------------------
+
+When using the timers, a few PWM outputs (analogWrite) are disabled depending on the timer used.
+
+ATmega168, ATmega328:
+- Using Timer 1 disables PWM (analogWrite) on pins 9 and 10
+
+ATmega2560:
+- Using Timer 1 disables PWM (analogWrite) on pins 11 and 12
+- Using Timer 3 disables PWM (analogWrite) on pins 2, 3 and 5
+- Using Timer 4 disables PWM (analogWrite) on pins 6, 7 and 8
+- Using Timer 5 disables PWM (analogWrite) on pins 44, 45 and 46
+
+<hr/>
+
 
 Example 1 - TimerBlinking
 -------------------------

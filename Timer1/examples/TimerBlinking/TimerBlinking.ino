@@ -1,5 +1,10 @@
 #include <Timer1.h>
 
+//*********************************************************************************
+// ATmega168, ATmega328: Using Timer 1 disables PWM (analogWrite) on pins 9 and 10
+// ATmega2560: Using Timer 1 disables PWM (analogWrite) on pins 11 and 12
+//*********************************************************************************
+
 // Pin 13 has an LED connected on most Arduino boards
 #define LED 13
 byte ledState;

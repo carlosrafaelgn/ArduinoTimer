@@ -37,15 +37,21 @@
 //
 // Timer 1 is available on ATmega168, ATmega328 and on ATmega2560
 // All other timers are only available on ATmega2560
+//
+// (The page and chapter numbers refer to the ATmega2560 documentation)
+
+//****************************************************************************
+// ATmega2560: Using Timer 5 disables PWM (analogWrite) on pins 44, 45 and 46
+//****************************************************************************
 
 #include <inttypes.h>
 
 // 16.9.6 TIMSK0 – Timer/Counter Interrupt Mask Register (page 134)
 #ifndef disableMillis
-#define disableMillis() TIMSK0 = 0
+#define disableMillis() TIMSK0 &= ~1
 #endif
 #ifndef enableMillis
-#define enableMillis() TIMSK0 = 1
+#define enableMillis() TIMSK0 |= 1
 #endif
 
 extern uint8_t __timer5Control;
