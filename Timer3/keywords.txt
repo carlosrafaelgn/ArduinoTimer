@@ -1,3 +1,4 @@
+microsFromCounting	KEYWORD2
 disableMillis	KEYWORD2
 enableMillis	KEYWORD2
 resetTimer3	KEYWORD2

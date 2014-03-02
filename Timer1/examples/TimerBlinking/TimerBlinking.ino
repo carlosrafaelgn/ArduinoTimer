@@ -1,19 +1,31 @@
 #include <Timer1.h>
 
-//*********************************************************************************
-// ATmega168, ATmega328: Using Timer 1 disables PWM (analogWrite) on pins 9 and 10
-// ATmega2560: Using Timer 1 disables PWM (analogWrite) on pins 11 and 12
-//*********************************************************************************
+//******************************************************************
+// ATmega168, ATmega328:
+// - Using Timer 1 disables PWM (analogWrite) on pins 9 and 10
+// ATmega2560:
+// - Using Timer 1 disables PWM (analogWrite) on pins 11 and 12
+// - Using Timer 3 disables PWM (analogWrite) on pins 2, 3 and 5
+// - Using Timer 4 disables PWM (analogWrite) on pins 6, 7 and 8
+// - Using Timer 5 disables PWM (analogWrite) on pins 44, 45 and 46
+//******************************************************************
 
-// Pin 13 has an LED connected on most Arduino boards
+// Pin 13 has a LED connected on most Arduino boards
 #define LED 13
 byte ledState;
 
 void setup()
 {
   ledState = 0;
+  // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
+  // delay() and delayMicroseconds() will not work)
+  disableMillis();
   // Prepare Timer1 to send notifications every 1000000us (1s)
-  startTimer1(1000000);
+  // On 16 MHz Arduino boards, this function has a resolution of 4us for intervals <= 260000,
+  // and a resolution of 16us for other intervals
+  // On 8 MHz Arduino boards, this function has a resolution of 8us for intervals <= 520000,
+  // and a resolution of 32us for other intervals
+  startTimer1(1000000L);
   pinMode(LED, OUTPUT);
 }
 
@@ -27,7 +39,7 @@ ISR(timer1Event)
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
   resetTimer1();
   // For a smaller and faster code, the line above could safely be replaced with a call
-  // to the function resetTimer1Unsafe() as, despite of its name, it IS safe to call
+  // to the function resetTimer1Unsafe() as, despite its name, it IS safe to call
   // that function in here (interrupts are disabled)
   
   // Make sure to do your work as fast as possible, since interrupts are automatically

@@ -6,29 +6,30 @@ ArduinoTimer is a library, which aims at providing developers with means to sche
 Timer1 can also be used with ATmega168 and with ATmega328. Nevertheless, Timer3, Timer4 and Timer5 are exclusive to ATmega2560.
 
 Each library has eight functions:
-- void startTimerNNN(unsigned long microsecondsInterval): Starts the timer, and schedules the first notification. On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 260000, and a resolution of 16us for greater intervals. On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 520000, and a resolution of 32us for greater intervals. 
-- void startCountingTimerNNN(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 4us. On 8 MHz Arduino boards, the timer has a resolution of 8us. In other words, the value returned by readTimerNNN() should be multiplied either by 4 ou by 8 to get the actual amount of microseconds. The value returned by readTimerNNN() resets approximately every 262ms on 16 MHz boards, and every 524ms on 8 MHz boards.
-- void resetTimerNNN(): Resets the timer's counter. This function should be called as soon as a notification is received, in order to properly prepare the timer for the next notification.
-- void resetTimerNNNUnsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
-- void pauseTimerNNN(): Pauses the timer, halting the counting and thus, preventing any further notifications.
-- void resumeTimerNNN(): Resumes the timer.
-- unsigned int readTimerNNN(): Returns the current value of the timer's counter.
-- unsigned int readTimerNNNUnsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
+- void startTimer#(unsigned long microsecondsInterval): Starts the timer, and schedules the first notification. On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 260000, and a resolution of 16us for greater intervals. On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 520000, and a resolution of 32us for greater intervals. 
+- void startCountingTimer#(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 4us. On 8 MHz Arduino boards, the timer has a resolution of 8us. In other words, the value returned by readTimer#() should be multiplied either by 4 ou by 8 to get the actual amount of microseconds. The value returned by readTimer#() resets approximately every 262ms on 16 MHz boards, and every 524ms on 8 MHz boards.
+- void resetTimer#(): Resets the timer's counter. This function should be called as soon as a notification is received, in order to properly prepare the timer for the next notification.
+- void resetTimer#Unsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
+- void pauseTimer#(): Pauses the timer, halting the counting and thus, preventing any further notifications.
+- void resumeTimer#(): Resumes the timer.
+- unsigned int readTimer#(): Returns the current value of the timer's counter.
+- unsigned int readTimer#Unsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
 
-Where NNN is 1, 3, 4 or 5, depending on the chosen library.
+Where # is 1, 3, 4 or 5, depending on the chosen library.
 
-There are also two other functions common to all libraries:
+There are also three other functions common to all libraries:
 - void disableMillis(): Disables Arduino's default millisecond counter, rendering millis(), micros(), delay() and delayMicroseconds() useless, while saving some processing power.
 - void enableMillis(): Enables Arduino's default millisecond counter.
+- void microsFromCounting(x): Returns the amount of microseconds in x (refer to Example 2 for sample usage).
 
-Functions resetTimerNNN, pauseTimerNNN, resumeTimerNNN, disableMillis and enableMillis are actually implemented as macros for best performance.
+Functions resetTimer#, pauseTimer#, resumeTimer#, disableMillis, enableMillis and microsFromCounting are actually implemented as macros for better performance.
 
 In order to receive the notifications, an interrupt handler must be setup as shown below:
 
 ``` c++
-ISR(timerNNNEvent)
+ISR(timer#Event)
 {
-  resetTimerNNN();
+  resetTimer#();
   // Handler code
 }
 ```
@@ -63,15 +64,22 @@ Example 1 - TimerBlinking
 ``` c++
 #include <Timer1.h>
 
-// Pin 13 has an LED connected on most Arduino boards
+// Pin 13 has a LED connected on most Arduino boards
 #define LED 13
 byte ledState;
 
 void setup()
 {
   ledState = 0;
+  // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
+  // delay() and delayMicroseconds() will not work)
+  disableMillis();
   // Prepare Timer1 to send notifications every 1000000us (1s)
-  startTimer1(1000000);
+  // On 16 MHz Arduino boards, this function has a resolution of 4us for intervals <= 260000,
+  // and a resolution of 16us for other intervals
+  // On 8 MHz Arduino boards, this function has a resolution of 8us for intervals <= 520000,
+  // and a resolution of 32us for other intervals
+  startTimer1(1000000L);
   pinMode(LED, OUTPUT);
 }
 
@@ -85,7 +93,7 @@ ISR(timer1Event)
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
   resetTimer1();
   // For a smaller and faster code, the line above could safely be replaced with a call
-  // to the function resetTimer1Unsafe() as, despite of its name, it IS safe to call
+  // to the function resetTimer1Unsafe() as, despite its name, it IS safe to call
   // that function in here (interrupts are disabled)
   
   // Make sure to do your work as fast as possible, since interrupts are automatically
@@ -111,7 +119,8 @@ void setup()
   // delay() and delayMicroseconds() will not work)
   disableMillis();
   // Prepare Timer1 to count
-  // (4us resolution on 16 MHz boards and 8us resolution on 8 MHz boards)
+  // On 16 MHz Arduino boards, this function has a resolution of 4us
+  // On 8 MHz Arduino boards, this function has a resolution of 8us
   startCountingTimer1();
   lastTime = readTimer1();
 }
@@ -120,12 +129,10 @@ void loop()
 {
   unsigned int now = readTimer1(), delta, deltamicros;
   delta = now - lastTime;
-  // Multiply delta either by 4 or by 8, depending on the CPU frequency,
-  // to obtain the amount of microseconds elapsed since last time
   // If you estimate this value could be > 65 ms, or 65535 us,
   // delta should be cast to unsigned long, and deltamicros should be
   // created as an unsigned long variable
-  deltamicros = delta << 2; // Multiplying by 4 (<< 3 multiplies by 8)
+  deltamicros = microsFromCounting(delta);
   
   // Do your work here
   
@@ -147,6 +154,10 @@ void setup()
   // delay() and delayMicroseconds() will not work)
   disableMillis();
   // Prepare Timer1 to send notifications every 1000us (1ms)
+  // On 16 MHz Arduino boards, this function has a resolution of 4us for intervals <= 260000,
+  // and a resolution of 16us for other intervals
+  // On 8 MHz Arduino boards, this function has a resolution of 8us for intervals <= 520000,
+  // and a resolution of 32us for other intervals
   startTimer1(1000);
 }
 
@@ -160,7 +171,7 @@ ISR(timer1Event)
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
   resetTimer1();
   // For a smaller and faster code, the line above could safely be replaced with a call
-  // to the function resetTimer1Unsafe() as, despite of its name, it IS safe to call
+  // to the function resetTimer1Unsafe() as, despite its name, it IS safe to call
   // that function in here (interrupts are disabled)
   
   // Make sure to do your work as fast as possible, since interrupts are automatically
