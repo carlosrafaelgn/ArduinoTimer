@@ -48,19 +48,28 @@
 
 // 16.9.6 TIMSK0 – Timer/Counter Interrupt Mask Register (page 134)
 #ifndef disableMillis
-#define disableMillis() TIMSK0 &= ~1
+  #define disableMillis() TIMSK0 &= ~1
 #endif
 #ifndef enableMillis
-#define enableMillis() TIMSK0 |= 1
+  #define enableMillis() TIMSK0 |= 1
 #endif
 #ifndef microsFromCounting
-#if (F_CPU == 16000000L)
-#define microsFromCounting(COUNTING) ((COUNTING) << 2)
-#elif (F_CPU == 8000000L)
-#define microsFromCounting(COUNTING) ((COUNTING) << 3)
-#else
-  #error("Unsupported CPU frequency")
+  #if (F_CPU == 16000000L)
+    #define microsFromCounting(COUNTING) ((COUNTING) << 2)
+  #elif (F_CPU == 8000000L)
+    #define microsFromCounting(COUNTING) ((COUNTING) << 3)
+  #else
+    #error("Unsupported CPU frequency")
+  #endif
 #endif
+#ifndef microsFromSlowCounting
+  #if (F_CPU == 16000000L)
+    #define microsFromSlowCounting(SLOWCOUNTING) ((SLOWCOUNTING) << 4)
+  #elif (F_CPU == 8000000L)
+    #define microsFromSlowCounting(SLOWCOUNTING) ((SLOWCOUNTING) << 5)
+  #else
+    #error("Unsupported CPU frequency")
+  #endif
 #endif
 
 extern uint8_t __timer3Control;
@@ -70,6 +79,7 @@ extern uint16_t __timer3CounterValue;
 #define pauseTimer3() TCCR3B = 0
 #define resumeTimer3() TCCR3B = __timer3Control
 extern void startTimer3(uint32_t microsecondsInterval);
+extern void startCountingTimer3(void);
 extern void startCountingTimer3(void);
 extern uint16_t readTimer3(void);
 extern void resetTimer3(void);

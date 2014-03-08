@@ -18,20 +18,20 @@ void setup()
   // delay() and delayMicroseconds() will not work)
   disableMillis();
   // Prepare Timer1 to count
-  // On 16 MHz Arduino boards, this function has a resolution of 4us
-  // On 8 MHz Arduino boards, this function has a resolution of 8us
-  startCountingTimer1();
+  // On 16 MHz Arduino boards, this function has a resolution of 16us
+  // On 8 MHz Arduino boards, this function has a resolution of 32us
+  startSlowCountingTimer1();
   lastTime = readTimer1();
 }
 
 void loop()
 {
-  unsigned int now = readTimer1(), delta, deltamicros;
+  unsigned int now = readTimer1(), delta;
+  unsigned long deltamicros;
   delta = now - lastTime;
-  // If you estimate deltamicros could be > 65 ms, or 65535 us,
-  // delta should be cast to unsigned long, and deltamicros should be
-  // created as an unsigned long variable
-  deltamicros = microsFromCounting(delta);
+  // If you estimate deltamicros will always be <= 65 ms, or 65535 us, you
+  // can remove the type cast and create deltamicros as unsigned int
+  deltamicros = microsFromSlowCounting((unsigned long)delta);
   
   // Do your work here
   

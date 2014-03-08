@@ -5,9 +5,10 @@ ArduinoTimer is a library, which aims at providing developers with means to sche
 
 Library Timer1 can be used with ATmega2560, ATmega168 and with ATmega328. Nevertheless, libraries Timer3, Timer4 and Timer5 are exclusive to ATmega2560.
 
-Each library has eight functions:
+Each library has nine functions:
 - void startTimer#(unsigned long microsecondsInterval): Starts the timer, and schedules the first notification. On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 260000, and a resolution of 16us for greater intervals. On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 520000, and a resolution of 32us for greater intervals. 
 - void startCountingTimer#(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 4us. On 8 MHz Arduino boards, the timer has a resolution of 8us. In other words, the value returned by readTimer#() should be multiplied either by 4 ou by 8 to get the actual amount of microseconds. The value returned by readTimer#() resets approximately every 262ms on 16 MHz boards, and every 524ms on 8 MHz boards.
+- void startSlowCountingTimer#(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 16us. On 8 MHz Arduino boards, the timer has a resolution of 32us. In other words, the value returned by readTimer#() should be multiplied either by 16 ou by 32 to get the actual amount of microseconds. The value returned by readTimer#() resets approximately every 1048ms on 16 MHz boards, and every 2097ms on 8 MHz boards.
 - void resetTimer#(): Resets the timer's counter. This function should be called as soon as a notification is received, in order to properly prepare the timer for the next notification.
 - void resetTimer#Unsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
 - void pauseTimer#(): Pauses the timer, halting the counting and thus, preventing any further notifications.
@@ -17,12 +18,13 @@ Each library has eight functions:
 
 Where # is 1, 3, 4 or 5, depending on the chosen library.
 
-There are also three other functions common to all libraries:
+There are also four other functions common to all libraries:
 - void disableMillis(): Disables Arduino's default millisecond counter, rendering millis(), micros(), delay() and delayMicroseconds() useless, while saving some processing power.
 - void enableMillis(): Enables Arduino's default millisecond counter.
 - void microsFromCounting(x): Returns the amount of microseconds in x (refer to Example 2 for sample usage).
+- void microsFromSlowCounting(x): Returns the amount of microseconds in x - only to be used when the timer was started with startSlowCountingTimer#() (refer to Example 3 for sample usage).
 
-Functions resetTimer#, pauseTimer#, resumeTimer#, disableMillis, enableMillis and microsFromCounting are actually implemented as macros for better performance.
+Functions resetTimer#, pauseTimer#, resumeTimer#, disableMillis, enableMillis, microsFromCounting, microsFromSlowCounting are actually implemented as macros for better performance.
 
 In order to receive the notifications, an interrupt handler must be setup as shown below:
 
@@ -129,7 +131,7 @@ void loop()
 {
   unsigned int now = readTimer1(), delta, deltamicros;
   delta = now - lastTime;
-  // If you estimate this value could be > 65 ms, or 65535 us,
+  // If you estimate deltamicros could be > 65 ms, or 65535 us,
   // delta should be cast to unsigned long, and deltamicros should be
   // created as an unsigned long variable
   deltamicros = microsFromCounting(delta);
@@ -140,7 +142,41 @@ void loop()
 }
 ```
 
-Example 3 - TimerNotificationCounting
+Example 3 - TimerSlowCounting
+-------------------------
+``` c++
+#include <Timer1.h>
+
+unsigned int lastTime;
+
+void setup()
+{
+  // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
+  // delay() and delayMicroseconds() will not work)
+  disableMillis();
+  // Prepare Timer1 to count
+  // On 16 MHz Arduino boards, this function has a resolution of 16us
+  // On 8 MHz Arduino boards, this function has a resolution of 32us
+  startSlowCountingTimer1();
+  lastTime = readTimer1();
+}
+
+void loop()
+{
+  unsigned int now = readTimer1(), delta;
+  unsigned long deltamicros;
+  delta = now - lastTime;
+  // If you estimate deltamicros will always be <= 65 ms, or 65535 us, you
+  // can remove the type cast and create deltamicros as unsigned int
+  deltamicros = microsFromSlowCounting((unsigned long)delta);
+  
+  // Do your work here
+  
+  lastTime = now;
+}
+```
+
+Example 4 - TimerNotificationCounting
 -------------------------------------
 ``` c++
 #include <Timer1.h>

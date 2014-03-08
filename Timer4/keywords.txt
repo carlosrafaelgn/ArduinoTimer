@@ -1,4 +1,5 @@
 microsFromCounting	KEYWORD2
+microsFromSlowCounting	KEYWORD2
 disableMillis	KEYWORD2
 enableMillis	KEYWORD2
 resetTimer4	KEYWORD2
@@ -7,6 +8,7 @@ pauseTimer4	KEYWORD2
 resumeTimer4	KEYWORD2
 startTimer4	KEYWORD2
 startCountingTimer4	KEYWORD2
+startSlowCountingTimer4	KEYWORD2
 readTimer4	KEYWORD2
 readTimer4Unsafe	KEYWORD2
 timer4Event	KEYWORD2

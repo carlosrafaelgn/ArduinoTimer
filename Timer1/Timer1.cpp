@@ -100,6 +100,23 @@ void startCountingTimer1(void) {
   TIMSK1 = 0;
   resumeTimer1();
 }
+// On 16 MHz Arduino boards, this function has a resolution of 16us
+// On 8 MHz Arduino boards, this function has a resolution of 32us
+void startSlowCountingTimer1(void) {
+  pauseTimer1();
+  TCCR1A = 0;
+  TCCR1C = 0;
+#if (F_CPU == 16000000L) || (F_CPU == 8000000L)
+  __timer1Control = B00000100;
+  __timer1CounterValue = 0;
+#else
+  #error("Unsupported CPU frequency")
+#endif
+  resetTimer1();
+  TIFR1 = 0;
+  TIMSK1 = 0;
+  resumeTimer1();
+}
 uint16_t readTimer1(void) {
   // 17.3 Accessing 16-bit Registers (page 138)
   uint8_t sreg;
