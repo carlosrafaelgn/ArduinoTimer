@@ -3,7 +3,7 @@ ArduinoTimer
 
 ArduinoTimer is a library, which aims at providing developers with means to schedule asynchronous timer execution, pretty much like timer services provided by real OSes. In fact, it is a set of libraries, one for each timer available in ATmega2560 (1, 3, 4 and 5). By dividing the full library into four smaller libraries, the developer can save both RAM and Flash memory. The file ArduinoTimer.zip is a convenience for downloading all files at once :)
 
-You can download ArduinoTimer library in a single zip file (here)[https://github.com/carlosrafaelgn/ArduinoTimer/blob/master/ArduinoTimer.zip?raw=true]!
+You can download ArduinoTimer library in a single zip file [here](https://github.com/carlosrafaelgn/ArduinoTimer/blob/master/ArduinoTimer.zip?raw=true)!
 
 Library Timer1 can be used with ATmega2560, ATmega168 and with ATmega328. Nevertheless, libraries Timer3, Timer4 and Timer5 are exclusive to ATmega2560.
 
