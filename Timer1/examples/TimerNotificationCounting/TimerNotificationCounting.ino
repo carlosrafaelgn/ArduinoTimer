@@ -16,20 +16,23 @@
 // - Using Timer 5 disables PWM (analogWrite) on pins 44, 45 and 46
 //******************************************************************
 
-unsigned int myMillis;
+unsigned long myMillis;
 
 void setup()
 {
-  myMillis = 0;
   // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
   // delay() and delayMicroseconds() will not work)
   disableMillis();
+  
   // Prepare Timer1 to send notifications every 1000us (1ms)
   // On 16 MHz Arduino boards, this function has a resolution of 4us for intervals <= 260000,
   // and a resolution of 16us for other intervals
   // On 8 MHz Arduino boards, this function has a resolution of 8us for intervals <= 520000,
   // and a resolution of 32us for other intervals
   startTimer1(1000);
+  
+  // Initialize our counter
+  myMillis = 0;
 }
 
 void loop()

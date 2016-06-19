@@ -16,30 +16,38 @@
 // - Using Timer 5 disables PWM (analogWrite) on pins 44, 45 and 46
 //******************************************************************
 
-unsigned int lastTime;
+unsigned short lastTickCount;
 
 void setup()
 {
   // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
   // delay() and delayMicroseconds() will not work)
   disableMillis();
+  
   // Prepare Timer1 to count
   // On 16 MHz Arduino boards, this function has a resolution of 16us
   // On 8 MHz Arduino boards, this function has a resolution of 32us
   startSlowCountingTimer1();
-  lastTime = readTimer1();
+  
+  // Initialize our counter
+  lastTickCount = readTimer1();
 }
 
 void loop()
 {
-  unsigned int now = readTimer1(), delta;
-  unsigned long deltamicros;
-  delta = now - lastTime;
-  // If you estimate deltamicros will always be <= 65 ms, or 65535 us, you
-  // can remove the type cast and create deltamicros as unsigned int
-  deltamicros = microsFromSlowCounting((unsigned long)delta);
+  // readTimer1() returns a maximum value of 65535
+  // That means the maximum possible delta one can measure with this
+  // function (when in slow counting mode) is 1048ms on 16 MHz boards,
+  // and 2097ms on 8 MHz boards
+  unsigned short currentTickCount = readTimer1();
+  unsigned short delta = currentTickCount - lastTickCount;
+  lastTickCount = currentTickCount;
+  
+  // If you estimate deltaMicros could be > 65 ms, or 65535 us,
+  // delta should be cast to unsigned long, and deltaMicros should be
+  // created as an unsigned long variable
+  // For example: unsigned long deltaMicros = microsFromCounting((unsigned long)delta);
+  unsigned short deltaMicros = microsFromSlowCounting(delta);
   
   // Do your work here
-  
-  lastTime = now;
 }

@@ -23,15 +23,19 @@ byte ledState;
 void setup()
 {
   ledState = 0;
+  
   // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
   // delay() and delayMicroseconds() will not work)
   disableMillis();
-  // Prepare Timer1 to send notifications every 1000000us (1s)
+  
+  // Prepare Timer1 to send notifications (interruptions) every 1000000us (1s)
   // On 16 MHz Arduino boards, this function has a resolution of 4us for intervals <= 260000,
   // and a resolution of 16us for other intervals
   // On 8 MHz Arduino boards, this function has a resolution of 8us for intervals <= 520000,
   // and a resolution of 32us for other intervals
   startTimer1(1000000L);
+  
+  // Configure the led pin as an output
   pinMode(LED, OUTPUT);
 }
 
@@ -39,7 +43,7 @@ void loop()
 {
 }
 
-// Define the function which will handle the notifications
+// Define the function which will handle the notifications (interruptions)
 ISR(timer1Event)
 {
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)

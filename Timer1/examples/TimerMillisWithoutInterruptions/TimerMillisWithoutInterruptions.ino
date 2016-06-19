@@ -17,6 +17,8 @@
 //******************************************************************
 
 unsigned short lastTickCount;
+unsigned short myMicros;
+unsigned long myMillis;
 
 void setup()
 {
@@ -29,16 +31,19 @@ void setup()
   // On 8 MHz Arduino boards, this function has a resolution of 8us
   startCountingTimer1();
   
-  // Initialize our counter
+  // Initialize our counters
   lastTickCount = readTimer1();
+  myMicros = 0;
+  myMillis = 0;
+  
+  Serial.begin(9600);
 }
 
 void loop()
 {
   // readTimer1() returns a maximum value of 65535
   // That means the maximum possible delta one can measure with this
-  // function (when in counting mode) is 262ms on 16 MHz boards,
-  // and 524ms on 8 MHz boards
+  // function is 262ms on 16 MHz boards, and 524ms on 8 MHz boards
   unsigned short currentTickCount = readTimer1();
   unsigned short delta = currentTickCount - lastTickCount;
   lastTickCount = currentTickCount;
@@ -49,5 +54,15 @@ void loop()
   // For example: unsigned long deltaMicros = microsFromCounting((unsigned long)delta);
   unsigned short deltaMicros = microsFromCounting(delta);
   
+  // Update our micro and millis counters
+  myMicros += deltaMicros;
+  while (myMicros >= 1000)
+  {
+    myMicros -= 1000;
+    myMillis++;
+  }
+  
   // Do your work here
+  
+  Serial.println(myMillis);
 }

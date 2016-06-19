@@ -75,15 +75,19 @@ byte ledState;
 void setup()
 {
   ledState = 0;
+  
   // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
   // delay() and delayMicroseconds() will not work)
   disableMillis();
-  // Prepare Timer1 to send notifications every 1000000us (1s)
+  
+  // Prepare Timer1 to send notifications (interruptions) every 1000000us (1s)
   // On 16 MHz Arduino boards, this function has a resolution of 4us for intervals <= 260000,
   // and a resolution of 16us for other intervals
   // On 8 MHz Arduino boards, this function has a resolution of 8us for intervals <= 520000,
   // and a resolution of 32us for other intervals
   startTimer1(1000000L);
+  
+  // Configure the led pin as an output
   pinMode(LED, OUTPUT);
 }
 
@@ -91,7 +95,7 @@ void loop()
 {
 }
 
-// Define the function which will handle the notifications
+// Define the function which will handle the notifications (interruptions)
 ISR(timer1Event)
 {
   // Reset Timer1 (resetTimer1 should be the first operation for better timer precision)
@@ -115,66 +119,97 @@ Example 2 - TimerCounting
 ``` c++
 #include <Timer1.h>
 
-unsigned int lastTime;
+unsigned short lastTickCount;
 
 void setup()
 {
   // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
   // delay() and delayMicroseconds() will not work)
   disableMillis();
+  
   // Prepare Timer1 to count
   // On 16 MHz Arduino boards, this function has a resolution of 4us
   // On 8 MHz Arduino boards, this function has a resolution of 8us
   startCountingTimer1();
-  lastTime = readTimer1();
+  
+  // Initialize our counter
+  lastTickCount = readTimer1();
 }
 
 void loop()
 {
-  unsigned int now = readTimer1(), delta, deltamicros;
-  delta = now - lastTime;
-  // If you estimate deltamicros could be > 65 ms, or 65535 us,
-  // delta should be cast to unsigned long, and deltamicros should be
+  // readTimer1() returns a maximum value of 65535
+  // That means the maximum possible delta one can measure with this
+  // function (when in counting mode) is 262ms on 16 MHz boards,
+  // and 524ms on 8 MHz boards
+  unsigned short currentTickCount = readTimer1();
+  unsigned short delta = currentTickCount - lastTickCount;
+  lastTickCount = currentTickCount;
+  
+  // If you estimate deltaMicros could be > 65 ms, or 65535 us,
+  // delta should be cast to unsigned long, and deltaMicros should be
   // created as an unsigned long variable
-  deltamicros = microsFromCounting(delta);
+  // For example: unsigned long deltaMicros = microsFromCounting((unsigned long)delta);
+  unsigned short deltaMicros = microsFromCounting(delta);
   
   // Do your work here
-  
-  lastTime = now;
 }
 ```
 
-Example 3 - TimerSlowCounting
--------------------------
+Example 3 - TimerMillisWithoutInterruptions
+-------------------------------------------
 ``` c++
 #include <Timer1.h>
 
-unsigned int lastTime;
+unsigned short lastTickCount;
+unsigned short myMicros;
+unsigned long myMillis;
 
 void setup()
 {
   // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
   // delay() and delayMicroseconds() will not work)
   disableMillis();
+  
   // Prepare Timer1 to count
-  // On 16 MHz Arduino boards, this function has a resolution of 16us
-  // On 8 MHz Arduino boards, this function has a resolution of 32us
-  startSlowCountingTimer1();
-  lastTime = readTimer1();
+  // On 16 MHz Arduino boards, this function has a resolution of 4us
+  // On 8 MHz Arduino boards, this function has a resolution of 8us
+  startCountingTimer1();
+  
+  // Initialize our counters
+  lastTickCount = readTimer1();
+  myMicros = 0;
+  myMillis = 0;
+  
+  Serial.begin(9600);
 }
 
 void loop()
 {
-  unsigned int now = readTimer1(), delta;
-  unsigned long deltamicros;
-  delta = now - lastTime;
-  // If you estimate deltamicros will always be <= 65 ms, or 65535 us, you
-  // can remove the type cast and create deltamicros as unsigned int
-  deltamicros = microsFromSlowCounting((unsigned long)delta);
+  // readTimer1() returns a maximum value of 65535
+  // That means the maximum possible delta one can measure with this
+  // function is 262ms on 16 MHz boards, and 524ms on 8 MHz boards
+  unsigned short currentTickCount = readTimer1();
+  unsigned short delta = currentTickCount - lastTickCount;
+  lastTickCount = currentTickCount;
+  
+  // If you estimate deltaMicros could be > 65 ms, or 65535 us,
+  // delta should be cast to unsigned long, and deltaMicros should be
+  // created as an unsigned long variable
+  // For example: unsigned long deltaMicros = microsFromCounting((unsigned long)delta);
+  unsigned short deltaMicros = microsFromCounting(delta);
+  
+  // Update our micro and millis counters
+  myMicros += deltaMicros;
+  while (myMicros >= 1000)
+  {
+    myMicros -= 1000;
+    myMillis++;
+  }
   
   // Do your work here
   
-  lastTime = now;
+  Serial.println(myMillis);
 }
 ```
 
@@ -183,20 +218,23 @@ Example 4 - TimerNotificationCounting
 ``` c++
 #include <Timer1.h>
 
-unsigned int myMillis;
+unsigned long myMillis;
 
 void setup()
 {
-  myMillis = 0;
   // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
   // delay() and delayMicroseconds() will not work)
   disableMillis();
+  
   // Prepare Timer1 to send notifications every 1000us (1ms)
   // On 16 MHz Arduino boards, this function has a resolution of 4us for intervals <= 260000,
   // and a resolution of 16us for other intervals
   // On 8 MHz Arduino boards, this function has a resolution of 8us for intervals <= 520000,
   // and a resolution of 32us for other intervals
   startTimer1(1000);
+  
+  // Initialize our counter
+  myMillis = 0;
 }
 
 void loop()
@@ -217,6 +255,48 @@ ISR(timer1Event)
   // more information on that)
   
   myMillis++;
+}
+```
+
+Example 5 - TimerSlowCounting
+-----------------------------
+``` c++
+#include <Timer1.h>
+
+unsigned short lastTickCount;
+
+void setup()
+{
+  // Disable Arduino's default millisecond counter (from now on, millis(), micros(),
+  // delay() and delayMicroseconds() will not work)
+  disableMillis();
+  
+  // Prepare Timer1 to count
+  // On 16 MHz Arduino boards, this function has a resolution of 16us
+  // On 8 MHz Arduino boards, this function has a resolution of 32us
+  startSlowCountingTimer1();
+  
+  // Initialize our counter
+  lastTickCount = readTimer1();
+}
+
+void loop()
+{
+  // readTimer1() returns a maximum value of 65535
+  // That means the maximum possible delta one can measure with this
+  // function (when in slow counting mode) is 1048ms on 16 MHz boards,
+  // and 2097ms on 8 MHz boards
+  unsigned short currentTickCount = readTimer1();
+  unsigned short delta = currentTickCount - lastTickCount;
+  lastTickCount = currentTickCount;
+  
+  // If you estimate deltaMicros could be > 65 ms, or 65535 us,
+  // delta should be cast to unsigned long, and deltaMicros should be
+  // created as an unsigned long variable
+  // For example: unsigned long deltaMicros = microsFromCounting((unsigned long)delta);
+  unsigned short deltaMicros = microsFromSlowCounting(delta);
+  
+  // Do your work here
 }
 ```
 
