@@ -1,6 +1,12 @@
 #include <Timer1.h>
 
 //******************************************************************
+// Copyright (c) 2013, Carlos Rafael Gimenes das Neves
+// This projected is licensed under the terms of the FreeBSD
+// License. See LICENSE.txt for more details.
+//
+// https://github.com/carlosrafaelgn/ArduinoTimer
+//
 // ATmega168, ATmega328:
 // - Using Timer 1 disables PWM (analogWrite) on pins 9 and 10
 // ATmega2560:
