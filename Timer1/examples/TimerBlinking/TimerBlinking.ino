@@ -1,5 +1,3 @@
-#include <Timer1.h>
-
 //******************************************************************
 // Copyright (c) 2013, Carlos Rafael Gimenes das Neves
 // This projected is licensed under the terms of the FreeBSD
@@ -15,6 +13,8 @@
 // - Using Timer 4 disables PWM (analogWrite) on pins 6, 7 and 8
 // - Using Timer 5 disables PWM (analogWrite) on pins 44, 45 and 46
 //******************************************************************
+
+#include <Timer1.h>
 
 // Pin 13 has a LED connected on most Arduino boards
 #define LED 13
