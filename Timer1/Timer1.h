@@ -74,6 +74,15 @@
     #error("Unsupported CPU frequency")
   #endif
 #endif
+#ifndef microsFromUltraSlowCounting
+  #if (F_CPU == 16000000L)
+    #define microsFromUltraSlowCounting(SLOWCOUNTING) ((SLOWCOUNTING) << 6)
+  #elif (F_CPU == 8000000L)
+    #define microsFromUltraSlowCounting(SLOWCOUNTING) ((SLOWCOUNTING) << 7)
+  #else
+    #error("Unsupported CPU frequency")
+  #endif
+#endif
 
 extern uint8_t __timer1Control;
 extern uint16_t __timer1CounterValue;
@@ -84,6 +93,7 @@ extern uint16_t __timer1CounterValue;
 extern void startTimer1(uint32_t microsecondsInterval);
 extern void startCountingTimer1(void);
 extern void startSlowCountingTimer1(void);
+extern void startUltraSlowCountingTimer1(void);
 extern uint16_t readTimer1(void);
 extern void resetTimer1(void);
 

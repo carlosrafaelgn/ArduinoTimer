@@ -71,6 +71,15 @@
     #error("Unsupported CPU frequency")
   #endif
 #endif
+#ifndef microsFromUltraSlowCounting
+  #if (F_CPU == 16000000L)
+    #define microsFromUltraSlowCounting(SLOWCOUNTING) ((SLOWCOUNTING) << 6)
+  #elif (F_CPU == 8000000L)
+    #define microsFromUltraSlowCounting(SLOWCOUNTING) ((SLOWCOUNTING) << 7)
+  #else
+    #error("Unsupported CPU frequency")
+  #endif
+#endif
 
 extern uint8_t __timer4Control;
 extern uint16_t __timer4CounterValue;
@@ -80,7 +89,8 @@ extern uint16_t __timer4CounterValue;
 #define resumeTimer4() TCCR4B = __timer4Control
 extern void startTimer4(uint32_t microsecondsInterval);
 extern void startCountingTimer4(void);
-extern void startCountingTimer4(void);
+extern void startSlowCountingTimer4(void);
+extern void startUltraSlowCountingTimer4(void);
 extern uint16_t readTimer4(void);
 extern void resetTimer4(void);
 

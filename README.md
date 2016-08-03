@@ -10,9 +10,10 @@ ArduinoTimer is a library, which aims at providing developers with means to sche
 Library Timer1 can be used with ATmega2560, ATmega168 and with ATmega328. Nevertheless, libraries Timer3, Timer4 and Timer5 are exclusive to ATmega2560.
 
 Each library has nine functions:
-- void startTimer#(unsigned long microsecondsInterval): Starts the timer, and schedules the first notification. On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 260000, and a resolution of 16us for greater intervals. On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 520000, and a resolution of 32us for greater intervals. 
+- void startTimer#(unsigned long microsecondsInterval): Starts the timer, and schedules the first notification. On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 262000, a resolution of 16us for intervals <= 1048000, and a resolution of 64us for intervals <= 4194000. On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 524000, a resolution of 32us for intervals <= 2097000, and a resolution os 128us for intervals <= 8388000. 
 - void startCountingTimer#(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 4us. On 8 MHz Arduino boards, the timer has a resolution of 8us. In other words, the value returned by readTimer#() should be multiplied either by 4 ou by 8 to get the actual amount of microseconds. The value returned by readTimer#() resets approximately every 262ms on 16 MHz boards, and every 524ms on 8 MHz boards.
 - void startSlowCountingTimer#(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 16us. On 8 MHz Arduino boards, the timer has a resolution of 32us. In other words, the value returned by readTimer#() should be multiplied either by 16 ou by 32 to get the actual amount of microseconds. The value returned by readTimer#() resets approximately every 1048ms on 16 MHz boards, and every 2097ms on 8 MHz boards.
+- void startUltraSlowCountingTimer#(): Starts the timer, but does not schedule any notifications. On 16 MHz Arduino boards, the timer has a resolution of 64us. On 8 MHz Arduino boards, the timer has a resolution of 128us. In other words, the value returned by readTimer#() should be multiplied either by 64 ou by 128 to get the actual amount of microseconds. The value returned by readTimer#() resets approximately every 4194ms on 16 MHz boards, and every 8388ms on 8 MHz boards.
 - void resetTimer#(): Resets the timer's counter. This function should be called as soon as a notification is received, in order to properly prepare the timer for the next notification.
 - void resetTimer#Unsafe(): A much faster version of the above function, but this one requires interrupts to be disabled.
 - void pauseTimer#(): Pauses the timer, halting the counting and thus, preventing any further notifications.
@@ -27,8 +28,9 @@ There are also four other functions common to all libraries:
 - void enableMillis(): Enables Arduino's default millisecond counter.
 - void microsFromCounting(x): Returns the amount of microseconds in x (refer to Example 2 for sample usage).
 - void microsFromSlowCounting(x): Returns the amount of microseconds in x - only to be used when the timer was started with startSlowCountingTimer#() (refer to Example 3 for sample usage).
+- void microsFromUltraSlowCounting(x): Returns the amount of microseconds in x - only to be used when the timer was started with startUltraSlowCountingTimer#().
 
-Functions resetTimer#, pauseTimer#, resumeTimer#, disableMillis, enableMillis, microsFromCounting, microsFromSlowCounting are actually implemented as macros for better performance.
+Functions resetTimer#, pauseTimer#, resumeTimer#, disableMillis, enableMillis, microsFromCounting, microsFromSlowCounting and microsFromUltraSlowCounting are actually implemented as macros for better performance.
 
 In order to receive the notifications, an interrupt handler must be setup as shown below:
 

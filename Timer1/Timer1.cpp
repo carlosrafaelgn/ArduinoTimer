@@ -39,9 +39,8 @@
 
 uint8_t __timer1Control;
 uint16_t __timer1CounterValue;
-// 0 < microsecondsInterval <= 1000000
-// On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 260000, and a resolution of 16us for other intervals
-// On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 520000, and a resolution of 32us for other intervals
+// On 16 MHz Arduino boards, this function has a resolution of 4us, for intervals <= 262000, a resolution of 16us for intervals <= 1048000, and a resolution of 64us for intervals <= 4194000
+// On 8 MHz Arduino boards, this function has a resolution of 8us, for intervals <= 524000, a resolution of 32us for intervals <= 2097000, and a resolution os 128us for intervals <= 8388000
 void startTimer1(uint32_t microsecondsInterval) {
   pauseTimer1();
   // 18. Timer/Counter 0, 1, 3, 4, and 5 Prescaler (page 169)
@@ -56,23 +55,29 @@ void startTimer1(uint32_t microsecondsInterval) {
   // 1 0 0 clkIO/256 (From prescaler)
   // 1 0 1 clkIO/1024 (From prescaler)
 #if (F_CPU == 16000000L)
-  if (microsecondsInterval <= 260000L) {
+  if (microsecondsInterval <= 262000L) {
     __timer1Control = B00000011;
     // The proper way of doing this would be:
     // 65536 - (microsecondsInterval / 4)
     // But, in order to save one 32-bit operation, this "- 1" is necessary...
     __timer1CounterValue = 65535 - ((uint16_t)(microsecondsInterval >> 2) - 1);
-  } else {
+  } else if (microsecondsInterval <= 1048000L) {
     __timer1Control = B00000100;
     __timer1CounterValue = 65535 - ((uint16_t)(microsecondsInterval >> 4) - 1);
+  } else {
+    __timer1Control = B00000101;
+    __timer1CounterValue = 65535 - ((uint16_t)(microsecondsInterval >> 6) - 1);
   }
 #elif (F_CPU == 8000000L)
-  if (microsecondsInterval <= 520000L) {
+  if (microsecondsInterval <= 524000L) {
     __timer1Control = B00000011;
     __timer1CounterValue = 65535 - ((uint16_t)(microsecondsInterval >> 3) - 1);
-  } else {
+  } else if (microsecondsInterval <= 2097000L) {
     __timer1Control = B00000100;
     __timer1CounterValue = 65535 - ((uint16_t)(microsecondsInterval >> 5) - 1);
+  } else {
+    __timer1Control = B00000101;
+    __timer1CounterValue = 65535 - ((uint16_t)(microsecondsInterval >> 7) - 1);
   }
 #else
   #error("Unsupported CPU frequency")
@@ -108,6 +113,23 @@ void startSlowCountingTimer1(void) {
   TCCR1C = 0;
 #if (F_CPU == 16000000L) || (F_CPU == 8000000L)
   __timer1Control = B00000100;
+  __timer1CounterValue = 0;
+#else
+  #error("Unsupported CPU frequency")
+#endif
+  resetTimer1();
+  TIFR1 = 0;
+  TIMSK1 = 0;
+  resumeTimer1();
+}
+// On 16 MHz Arduino boards, this function has a resolution of 64us
+// On 8 MHz Arduino boards, this function has a resolution of 128us
+void startUltraSlowCountingTimer1(void) {
+  pauseTimer1();
+  TCCR1A = 0;
+  TCCR1C = 0;
+#if (F_CPU == 16000000L) || (F_CPU == 8000000L)
+  __timer1Control = B00000101;
   __timer1CounterValue = 0;
 #else
   #error("Unsupported CPU frequency")
