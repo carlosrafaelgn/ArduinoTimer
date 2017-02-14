@@ -83,7 +83,7 @@ void startTimer4(uint32_t microsecondsInterval) {
   #error("Unsupported CPU frequency")
 #endif
   resetTimer4();
-  // 17.11.37 TIFR4 – Timer/Counter4 Interrupt Flag Register (page 167)
+  // 17.11.37 TIFR4 â€“ Timer/Counter4 Interrupt Flag Register (page 167)
   TIFR4 = 0;
   TIMSK4 = 1;
   resumeTimer4();
@@ -124,7 +124,7 @@ void startSlowCountingTimer4(void) {
 }
 // On 16 MHz Arduino boards, this function has a resolution of 64us
 // On 8 MHz Arduino boards, this function has a resolution of 128us
-void startSlowCountingTimer4(void) {
+void startUltraSlowCountingTimer4(void) {
   pauseTimer4();
   TCCR4A = 0;
   TCCR4C = 0;
@@ -144,7 +144,7 @@ uint16_t readTimer4(void) {
   uint8_t sreg;
   uint16_t i;
   // Save global interrupt flag
-  // 7.4.1 SREG – AVR Status Register (page 14)
+  // 7.4.1 SREG â€“ AVR Status Register (page 14)
   sreg = SREG;
   // Disable interrupts
   cli();
@@ -158,7 +158,7 @@ void resetTimer4(void) {
   // 17.3 Accessing 16-bit Registers (page 138)
   uint8_t sreg;
   // Save global interrupt flag
-  // 7.4.1 SREG – AVR Status Register (page 14)
+  // 7.4.1 SREG â€“ AVR Status Register (page 14)
   sreg = SREG;
   // Disable interrupts
   cli();
