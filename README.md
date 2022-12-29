@@ -26,9 +26,9 @@ Where # is 1, 3, 4 or 5, depending on the chosen library.
 There are also four other functions common to all libraries:
 - void disableMillis(): Disables Arduino's default millisecond counter, rendering millis(), micros(), delay() and delayMicroseconds() useless, while saving some processing power.
 - void enableMillis(): Enables Arduino's default millisecond counter.
-- void microsFromCounting(x): Returns the amount of microseconds in x (refer to Example 2 for sample usage).
-- void microsFromSlowCounting(x): Returns the amount of microseconds in x - only to be used when the timer was started with startSlowCountingTimer#() (refer to Example 3 for sample usage).
-- void microsFromUltraSlowCounting(x): Returns the amount of microseconds in x - only to be used when the timer was started with startUltraSlowCountingTimer#().
+- xxx microsFromCounting(x): Returns the amount of microseconds in x (refer to Example 2 for sample usage and bear in mind this is a macro, not an actual function, therefore the return type is not defined).
+- xxx microsFromSlowCounting(x): Returns the amount of microseconds in x - only to be used when the timer was started with startSlowCountingTimer#() (refer to Example 3 for sample usage and bear in mind this is a macro, not an actual function, therefore the return type is not defined).
+- xxx microsFromUltraSlowCounting(x): Returns the amount of microseconds in x - only to be used when the timer was started with startUltraSlowCountingTimer#() (bear in mind this is a macro, not an actual function, therefore the return type is not defined).
 
 Functions resetTimer#, pauseTimer#, resumeTimer#, disableMillis, enableMillis, microsFromCounting, microsFromSlowCounting and microsFromUltraSlowCounting are actually implemented as macros for better performance.
 
